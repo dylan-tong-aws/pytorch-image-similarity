@@ -73,26 +73,17 @@ def predict_fn(input_data, model):
     input_data = input_data.to(DEVICE)
     
     logger.info(input_data.shape)
-    #images = torch.split(input_data, int(input_data.shape[0]/2))
     
     img1 = input_data.narrow(0,0,1)
     img2 = input_data.narrow(0,1,input_data.shape[0]-1)
     
     print(img1.shape)
     print(img2.shape)
-    
-    #img1= img1.expand(img2.shape[0],img1.shape[1],img1.shape[2],img1.shape[3])
-    
+        
     logger.info(img1.shape)
     logger.info(img2.shape)
-   # logger.info(print(model))
-    
-#    distances = []   
-#    for i in range(img2.shape[0]) :
-#        distances.append(model.forward(img1,img2[i].unsqueeze_(0))[0].item())
-#        logger.info('index: '+str(i))
     distances = model.forward(img1,img2).tolist()
 
     logger.info(distances)
-    #' \n '.join(map(str, distances))
+
     return distances
