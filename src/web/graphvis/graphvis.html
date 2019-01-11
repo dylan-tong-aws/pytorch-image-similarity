@@ -1,8 +1,11 @@
 <html>
 <head>
-    <script type="text/javascript" src="./node_modules/vis/dist/vis.js"></script>
-    <script src="./node_modules/jquery/dist/jquery.min.js"></script>
-    <link href="./node_modules/vis/dist/vis.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="https://unpkg.com/vis@4.20.0/dist/vis.js"></script>
+    <script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <link href="https://unpkg.com/vis@4.20.0/dist/vis.css" rel="stylesheet" type="text/css" />
 
     <style type="text/css">
         #mynetwork {
@@ -20,7 +23,7 @@
         const img_loc = "https://s3-us-west-2.amazonaws.com/reinvent2018-sagemaker-pytorch/data/raw/";
         var selectedImage = "Boots/Knee%20High/Anne%20Klein/8059298.310.jpg";
         const N = 7;
-        const API_ENDPOINT =  'https://w2ga422zm5.execute-api.us-east-1.amazonaws.com';
+        const API_ENDPOINT =  'https://oq73ybrgs2.execute-api.us-west-2.amazonaws.com';
                   
         function get_query(img, topN) {
             return API_ENDPOINT+"/Prod/catalog?img="+img+"&n="+topN;

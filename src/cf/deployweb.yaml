@@ -1,0 +1,19 @@
+Resources:
+  S3Macros:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: !Join 
+        - ''
+        - - >-
+            https://s3-us-west-2.amazonaws.com/reinvent2018-sagemaker-pytorch/cloudformation/blog/shop-by-style/macro.template
+      TimeoutInMinutes: '30'
+
+  TestMacro:
+    Type: 'AWS::CloudFormation::Stack'
+    DependsOn: S3Macros
+    Properties:
+      TemplateURL: !Join 
+        - ''
+        - - >-
+            https://s3-us-west-2.amazonaws.com/reinvent2018-sagemaker-pytorch/cloudformation/blog/shop-by-style/testmacro.yaml
+      TimeoutInMinutes: '30'

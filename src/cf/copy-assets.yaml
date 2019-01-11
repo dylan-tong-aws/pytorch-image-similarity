@@ -1,0 +1,44 @@
+Transform: S3Objects
+Resources:
+  WebAssetsBucket:
+    Type: AWS::S3::Bucket
+  SampleWebPage:
+    Type: AWS::S3::Object
+    Properties:
+      Source:
+        Bucket: 'reinvent2018-sagemaker-pytorch'
+        Key: web/sample-web/shoerack.html
+      Target:
+        Bucket: !Ref WebAssetsBucket
+        Key: shoerack.html
+  SampleWebPageCSS:
+    Type: AWS::S3::Object
+    Properties:
+      Source:
+        Bucket: 'reinvent2018-sagemaker-pytorch'
+        Key: web/sample-web/css/style.css
+      Target:
+        Bucket: !Ref WebAssetsBucket
+        Key: css/style.css
+  GraphVisWebPage:
+    Type: AWS::S3::Object
+    Properties:
+      Source:
+        Bucket: 'reinvent2018-sagemaker-pytorch'
+        Key: web/graphvis/graphvis.html
+      Target:
+        Bucket: !Ref WebAssetsBucket
+        Key: graphvis.html
+Outputs:
+  SampleWebPageURL:
+    Description: url to sample shop-by-style webpage
+    Value: !Join 
+      - ''
+      - - !GetAtt WebAssetsBucket.WebsiteURL
+        - '/shoerack.html'
+  SampleGraphVisURL:
+    Description: url to sample graph visualization webpage
+    Value: !Join 
+      - ''
+      - - !GetAtt WebAssetsBucket.WebsiteURL
+        - '/graphvis.html'
