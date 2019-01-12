@@ -7,13 +7,52 @@ Resources:
         - - >-
             https://s3-us-west-2.amazonaws.com/reinvent2018-sagemaker-pytorch/cloudformation/blog/shop-by-style/macro.template
       TimeoutInMinutes: '30'
-
-  TestMacro:
+  WebAssets:
     Type: 'AWS::CloudFormation::Stack'
     DependsOn: S3Macros
     Properties:
       TemplateURL: !Join 
         - ''
         - - >-
-            https://s3-us-west-2.amazonaws.com/reinvent2018-sagemaker-pytorch/cloudformation/blog/shop-by-style/testmacro.yaml
+            https://s3-us-west-2.amazonaws.com/reinvent2018-sagemaker-pytorch/cloudformation/blog/shop-by-style/copy-assets.yaml
       TimeoutInMinutes: '30'
+  CloudFrontOAI:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: 'OAI for shop-by-style web asset origin'
+  CloudFrontWebDistribution:
+    Type: AWS::CloudFront::Distribution
+    DependsOn: WebAssets
+    Properties:
+      DistributionConfig:
+        Origins:
+        - Id: ShopByStyleOrigin
+          DomainName: !GetAtt 
+            - WebAssets
+            - Outputs.S3WebAssetsDomain
+          S3OriginConfig:
+           OriginAccessIdentity: !Ref CloudFrontOAI
+        Enabled: 'true'
+        DefaultRootObject: !GetAtt
+          - WebAssets
+          - Outputs.DefaultWebroot
+        DefaultCacheBehavior:
+          AllowedMethods:
+          - DELETE
+          - GET
+          - HEAD
+          - OPTIONS
+          - PATCH
+          - POST
+          - PUT
+          TargetOriginId: ShopByStyleOrigin  
+          ForwardedValues:
+            QueryString: 'false'
+            Headers: [Access-Control-Request-Headers,Access-Control-Request-Method,Origin]
+            Cookies:
+              Forward: none
+          ViewerProtocolPolicy: allow-all
+        PriceClass: PriceClass_All
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: 'true'
