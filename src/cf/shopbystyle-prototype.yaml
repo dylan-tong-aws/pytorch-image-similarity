@@ -104,6 +104,14 @@ Conditions:
       - !Ref DBReplicaIdentifierSuffix
       - ''
 Resources:
+  WebAssetStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL: !Join 
+        - ''
+        - - >-
+            https://s3-us-west-2.amazonaws.com/reinvent2018-sagemaker-pytorch/cloudformation/blog/shop-by-style/deployweb.yaml
+      TimeoutInMinutes: '120'
   NeptuneStack:
     Type: 'AWS::CloudFormation::Stack'
     Properties:
@@ -188,6 +196,24 @@ Resources:
           - NeptuneStack
           - Outputs.NeptuneSG
 Outputs:
+  ShoeRackPageURL:
+    Description: url to sample shop-by-style webpage
+    Value: !Join 
+      - ''
+      - - !GetAtt [WebAssetStack, Outputs.SampleWebPageURL]
+        - "?provider="
+        - !GetAtt [MicroservicesStack, Outputs.ServerlessRestApiInvokeURL]
+    Export:
+      Name: ShoeRackPageURL
+  GraphVisURL:
+    Description: url to sample graph visualization webpage
+    Value: !Join 
+      - ''
+      - - !GetAtt [WebAssetStack, Outputs.SampleGraphVisURL]
+        - "?provider="
+        - !GetAtt [MicroservicesStack, Outputs.ServerlessRestApiInvokeURL]
+    Export:
+      Name: GraphVisURL
   DBClusterId:
     Description: Neptune Cluster Identifier
     Value: !GetAtt 

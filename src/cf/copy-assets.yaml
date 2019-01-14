@@ -30,23 +30,11 @@ Resources:
         Bucket: !Ref WebAssetsBucket
         Key: graphvis.html
 Outputs:
+  WebAssetsBucket:
+    Value: !Ref WebAssetsBucket
+    Export:
+      Name: WebAssetsBucket
   S3WebAssetsDomain:
     Value: !GetAtt WebAssetsBucket.DomainName
     Export: 
       Name: "S3WebAssetsDomain"
-  DefaultWebroot:
-    Value: shoerack.html
-    Export: 
-      Name: "DefaultWebroot"  
-  SampleWebPageURL:
-    Description: url to sample shop-by-style webpage
-    Value: !Join 
-      - ''
-      - - !GetAtt WebAssetsBucket.WebsiteURL
-        - '/shoerack.html'        
-  SampleGraphVisURL:
-    Description: url to sample graph visualization webpage
-    Value: !Join 
-      - ''
-      - - !GetAtt WebAssetsBucket.WebsiteURL
-        - '/graphvis.html'

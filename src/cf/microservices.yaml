@@ -49,24 +49,18 @@ Resources:
           __ApiId__: !Ref ServerlessRestApi
   ServerlessRestApiProdStage:
     Type: 'AWS::ApiGateway::Stage'
+    DependsOn: [ServerlessRestApiDeploymentef8584eec9,ServerlessRestApi]
     Properties:
       DeploymentId: !Ref ServerlessRestApiDeploymentef8584eec9
       RestApiId: !Ref ServerlessRestApi
       CacheClusterEnabled: 'true'
       CacheClusterSize: '1.6'
-      CacheTtlInSeconds: 3600
+      MethodSettings: 
+        - ResourcePath: "/*"
+          HttpMethod: '*'
+          CacheTtlInSeconds: 3600
+          CachingEnabled: 'true'
       StageName: Prod
-  generateGraphJSONLambdaMicroservicePermissionProd:
-    Type: 'AWS::Lambda::Permission'
-    Properties:
-      Action: 'lambda:invokeFunction'
-      Principal: apigateway.amazonaws.com
-      FunctionName: !Ref generateGraphJSON
-      SourceArn: !Sub 
-        - >-
-          arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/graph
-        - __Stage__: Prod
-          __ApiId__: !Ref ServerlessRestApi
   SimilaritySearchPermission:
     Type: 'AWS::Lambda::Permission'
     Properties:
@@ -76,39 +70,16 @@ Resources:
         - SimilaritySearch
         - Arn
       SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/*/*/*'
-  generateGraphJSONLambdaMicroservicePermissionTest:
-    Type: 'AWS::Lambda::Permission'
-    Properties:
-      Action: 'lambda:invokeFunction'
-      Principal: apigateway.amazonaws.com
-      FunctionName: !Ref generateGraphJSON
-      SourceArn: !Sub 
-        - >-
-          arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/graph
-        - __Stage__: '*'
-          __ApiId__: !Ref ServerlessRestApi
-  generateGraphJSON:
-    Type: 'AWS::Lambda::Function'
-    Properties:
-      Code:
-        S3Bucket: reinvent2018-sagemaker-pytorch
-        S3Key: cloudformation/blog/shop-by-style/33ef46afa6c7f742d974f0356fafbb61
-      Description: ''
-      Tags:
-        - Value: SAM
-          Key: 'lambda:createdBy'
-      MemorySize: 128
-      Handler: generateGraphJSON/index.handler
-      Role: !GetAtt 
-        - LambdaExecutionRole
-        - Arn
-      Timeout: 60
-      Runtime: nodejs6.10
   ServerlessRestApiDeploymentef8584eec9:
     Type: 'AWS::ApiGateway::Deployment'
     Properties:
       RestApiId: !Ref ServerlessRestApi
       Description: 'RestApi deployment id: ef8584eec937e78720d42b5535c1f3865bfdedb3'
+      StageDescription:
+        CacheTtlInSeconds: 3600
+        CacheClusterEnabled: 'true'
+        CacheClusterSize: '1.6'
+        TracingEnabled: 'true'
       StageName: Stage
   SimilaritySearch:
     Type: 'AWS::Lambda::Function'
@@ -142,7 +113,6 @@ Resources:
     Type: 'AWS::ApiGateway::RestApi'
     DependsOn: 
       - SimilaritySearch
-      - generateGraphJSON
     Properties:
       Body:
         info:
@@ -169,16 +139,7 @@ Resources:
                 cacheKeyParameters:
                 - "method.request.querystring.img"
                 - "method.request.querystring.n"
-                type: "aws_proxy"
-          /graph:
-            x-amazon-apigateway-any-method:
-              responses: {}
-              x-amazon-apigateway-integration:
-                uri: !Sub >-
-                          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${generateGraphJSON.Arn}/invocations
-                passthroughBehavior: "when_no_match"
-                httpMethod: "POST"
-                type: "aws_proxy"       
+                type: "aws_proxy"  
         swagger: '2.0'
   SimilaritySearchLambdaMicroservicePermissionProd:
     Type: 'AWS::Lambda::Permission'
@@ -191,12 +152,8 @@ Resources:
           arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/*/catalog
         - __Stage__: Prod
           __ApiId__: !Ref ServerlessRestApi
-  generateGraphJSONPermission:
-    Type: 'AWS::Lambda::Permission'
-    Properties:
-      Action: 'lambda:InvokeFunction'
-      Principal: apigateway.amazonaws.com
-      FunctionName: !GetAtt 
-        - generateGraphJSON
-        - Arn
-      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/*/*/*'
+Outputs:
+  ServerlessRestApiInvokeURL:
+    Value: !Sub "${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Export:
+      Name: ServerlessRestApiInvokeURL

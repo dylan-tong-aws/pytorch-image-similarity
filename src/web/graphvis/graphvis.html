@@ -23,7 +23,9 @@
         const img_loc = "https://s3-us-west-2.amazonaws.com/reinvent2018-sagemaker-pytorch/data/raw/";
         var selectedImage = "Boots/Knee%20High/Anne%20Klein/8059298.310.jpg";
         const N = 7;
-        const API_ENDPOINT =  'https://oq73ybrgs2.execute-api.us-west-2.amazonaws.com';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const API_ENDPOINT = 'https://'+urlParams.get('provider');
                   
         function get_query(img, topN) {
             return API_ENDPOINT+"/Prod/catalog?img="+img+"&n="+topN;
