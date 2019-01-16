@@ -1,4 +1,5 @@
 
+In the process of transferring this to an  AWS-lab repository, and will be open sourced. Stay tune...
 
 ## Workshop Guide
 
